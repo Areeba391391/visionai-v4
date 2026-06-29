@@ -163,7 +163,7 @@ html, body, [class*="css"], p, span, div, label, h1, h2, h3, h4, h5 {
     background:rgba(0,245,212,.1) !important; border-color:#00f5d4 !important;
     color:#00f5d4 !important; box-shadow:0 0 14px rgba(0,245,212,.15) !important;
 }
-[data-testid="stRadio"] [data-baseweb="radio"] div:first-child { display:none !important; }
+[data-testid="stRadio"] [data-baseweb="radio"] > div:has(input) { display:none !important; }
 
 /* ─── FILE UPLOADER ─── */
 [data-testid="stFileUploader"] > section {
@@ -378,6 +378,29 @@ hr { border:none !important; border-top:1px solid #1e1e38 !important; margin:16p
 
 /* ─── LINE CHART overrides ─── */
 [data-testid="stVegaLiteChart"] canvas, [data-testid="stArrowVegaLiteChart"] canvas { background:transparent !important; }
+
+/* ─── PREVENT HORIZONTAL OVERFLOW / CROPPING ─── */
+html, body { overflow-x:hidden !important; width:100% !important; max-width:100vw !important; }
+.stApp, [data-testid="stAppViewContainer"], [data-testid="stAppViewBlockContainer"], .main, .block-container {
+    max-width:100vw !important; overflow-x:hidden !important;
+}
+.vnav, .vcontent { max-width:100vw !important; }
+
+/* ─── RESPONSIVE / MOBILE ─── */
+@media (max-width: 768px) {
+    .vnav { flex-wrap:wrap; height:auto; padding:10px 14px; row-gap:8px; }
+    .vnav-stats { width:100%; flex-wrap:wrap; margin-left:0; justify-content:space-between; }
+    .vnav-stat { padding:0 8px; border-left:none; flex:1; min-width:70px; }
+    .vcontent { padding:14px 12px 30px; }
+    .vcontrols { padding:14px 12px 10px; }
+    .chips { gap:8px; }
+    .chip { min-width:90px; padding:10px 12px; }
+    .chip-v { font-size:1.15rem; }
+    [data-testid="stRadio"] label[data-baseweb="radio"] { padding:8px 14px; font-size:.74rem; }
+    .gcard { padding:14px; }
+    [data-testid="stHorizontalBlock"] { flex-wrap:wrap !important; }
+    [data-testid="column"] { width:100% !important; min-width:100% !important; flex:1 1 100% !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -637,7 +660,7 @@ with tab_d:
                     bdgs="".join([f'<span class="bdg"><span class="bdg-dot" style="background:{d["color"]}"></span>{d["label"]} {d["conf"]*100:.0f}%</span>'
                                    for d in sorted(dets,key=lambda x:-x["conf"])])
                     st.markdown(f'<div class="badges">{bdgs}</div>',unsafe_allow_html=True)
-                    with st.expander("Detection table",expanded=False):
+                    with st.expander("Detection table",expanded=True):
                         df=pd.DataFrame([{"Class":d["label"],"Conf":f'{d["conf"]*100:.1f}%',
                                            "X":d["bbox"][0],"Y":d["bbox"][1],"W":d["bbox"][2],"H":d["bbox"][3]}
                                           for d in dets])
@@ -711,7 +734,7 @@ with tab_d:
                     bdgs="".join([f'<span class="bdg"><span class="bdg-dot" style="background:{PALETTE[i%len(PALETTE)]}"></span>{l} ×{c}</span>'
                                    for i,(l,c) in enumerate(sorted(cf.items(),key=lambda x:-x[1]))])
                     st.markdown(f'<div class="badges">{bdgs}</div>',unsafe_allow_html=True)
-                    with st.expander(f"Detection table ({len(all_dets):,} rows)",expanded=False):
+                    with st.expander(f"Detection table ({len(all_dets):,} rows)",expanded=True):
                         df=pd.DataFrame(all_dets)[["frame","label","conf","bbox"]]
                         df["conf"]=df["conf"].map(lambda x:f"{x*100:.1f}%")
                         df.columns=["Frame","Class","Confidence","Bbox"]
